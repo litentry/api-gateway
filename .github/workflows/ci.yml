@@ -1,13 +1,11 @@
 name: CI
 
-on:
-  push:
-    branches: [main]
 
   workflow_dispatch:
 
 jobs:
-  build:
+  test:
+    on: [pull_request]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,10 +14,14 @@ jobs:
           node-version: '14'
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
+      - run: yarn build
       - run: yarn test
 
   deploy:
-    needs: build
+    on:
+      push:
+        branches: [main]
+    needs: test
     runs-on: ubuntu-latest
     environment: production
     steps:
